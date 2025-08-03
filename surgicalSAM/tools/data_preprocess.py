@@ -152,6 +152,7 @@ predictor = SamPredictor(sam)
 # define data
 dataset_name = args.dataset
 data_root_dir = f"../../data/{dataset_name}"
+# data_root_dir = f"../../data/set3/{dataset_name}"
 
 if dataset_name == "endovis_2018":
     mask_dir = osp.join(data_root_dir, "train", "0", "binary_annotations")
@@ -207,7 +208,7 @@ for n, frame_name in enumerate(frame_list):
         np.random.seed(version)
 
         # perform augmentation to the frame and its masks based on the current version number
-        scale, rotate, colour = version_to_augmentation_toggles(version)        
+        scale, rotate, colour = version_to_augmentation_toggles(version, n_version)        
         frame, masks = augmentation(original_frame, original_masks, scale_factor, rotate_angle, colour_factor, H, W, scale = scale, rotate = rotate, colour = colour)
         frame = np.asarray(frame)
         masks = [np.asarray(mask)*255 for mask in masks]
@@ -223,7 +224,7 @@ for n, frame_name in enumerate(frame_list):
         elif dataset_name == "endovis_2017":
             save_dir = osp.join(data_root_dir, str(version))        
         frame_save_dir = osp.join(save_dir,  "images", frame_name)
-        feat_save_dir = osp.join(save_dir, f"sam_features_{vit_mode}", frame_name.split(".")[0] + "npy")
+        feat_save_dir = osp.join(save_dir, f"sam_features_{vit_mode}", frame_name.split(".")[0] + ".npy")
         os.makedirs(osp.dirname(frame_save_dir), exist_ok = True) 
         os.makedirs(osp.dirname(feat_save_dir), exist_ok = True) 
         
