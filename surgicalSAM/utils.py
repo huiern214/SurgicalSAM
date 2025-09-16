@@ -14,10 +14,11 @@ def create_binary_masks(binary_masks, preds, preds_quality, mask_names, thr):
     Returns:
         dict: a dictionary containing all predicted binary masks organised based on sequence, frame, and mask name
     """
-    preds = preds.cpu()
+    preds = preds.cpu() # logits
+    # preds = torch.sigmoid(preds).cpu()
     preds_quality = preds_quality.cpu()
     
-    pred_masks = (preds > thr).int()
+    pred_masks = (preds > thr).int() # if logits before sigmoid, thr=0 (same as thr=0.5 if sigmoid applied)
     
 
     for pred_mask, mask_name, pred_quality in zip(pred_masks, mask_names, preds_quality):        
@@ -76,7 +77,7 @@ def create_endovis_masks(binary_masks, H, W):
     return endovis_masks
 
 
-def eval_endovis(endovis_masks, gt_endovis_masks):
+def eval_endovis(endovis_masks, gt_endovis_masks, num_classes=7):
     """Given the predicted masks and groundtruth annotations, predict the challenge IoU, IoU, mean class IoU, and the IoU for each class
         
       ** The evaluation code is taken from the official evaluation code of paper: ISINet: An Instance-Based Approach for Surgical Instrument Segmentation
@@ -91,7 +92,6 @@ def eval_endovis(endovis_masks, gt_endovis_masks):
     """
 
     endovis_results = dict()
-    num_classes = 7
     
     all_im_iou_acc = []
     all_im_iou_acc_challenge = []
@@ -101,7 +101,13 @@ def eval_endovis(endovis_masks, gt_endovis_masks):
     for file_name, prediction in endovis_masks.items():
        
         full_mask = gt_endovis_masks[file_name]
-        
+        if num_classes == 4:
+            # en17 model
+            allowed_classes = [1,2,3,6]
+            full_mask[~torch.isin(full_mask, torch.tensor(allowed_classes))] = 0
+            # en18 model
+            # full_mask[full_mask > num_classes] = 0  # Ensure no class id exceeds num_classes (1,2,3,4)
+
         im_iou = []
         im_iou_challenge = []
         target = full_mask.numpy()
@@ -173,6 +179,7 @@ def compute_mask_IU_endovis(masks, target):
 
 def read_gt_endovis_masks(data_root_dir = "../data/endovis_2018",
                           mode = "val", 
+                          convert2source=False,
                           fold = None):
     
     """Read the annotation masks into a dictionary to be used as ground truth in evaluation.
@@ -183,11 +190,28 @@ def read_gt_endovis_masks(data_root_dir = "../data/endovis_2018",
     gt_endovis_masks = dict()
     
     if "2018" in data_root_dir:
-        gt_endovis_masks_path = osp.join(data_root_dir, mode, "annotations")
+        # gt_endovis_masks_path = osp.join(data_root_dir, mode, "annotations")
+        if mode == "train":
+            gt_endovis_masks_path = osp.join(data_root_dir, mode, "0", "annotations")
+        elif mode == "val":
+            gt_endovis_masks_path = osp.join(data_root_dir, mode, "annotations")
         for seq in os.listdir(gt_endovis_masks_path):
             for mask_name in os.listdir(osp.join(gt_endovis_masks_path, seq)):
                 full_mask_name = f"{seq}/{mask_name}"
                 mask = torch.from_numpy(cv2.imread(osp.join(gt_endovis_masks_path, full_mask_name),cv2.IMREAD_GRAYSCALE))
+                
+                if convert2source:
+                    # Mapping MCS (EN18: class 4 -> EN17: class 6)
+                    mapping = {
+                        4: 6,  
+                        6: 4,
+                    }
+                    # Create a new mask where each pixel is remapped
+                    mapped_mask = mask.clone()
+                    for src_class, tgt_class in mapping.items():
+                        mapped_mask[mask == src_class] = tgt_class
+                    mask = mapped_mask  # use the mapped version
+                    
                 gt_endovis_masks[full_mask_name] = mask
                 
     elif "2017" in data_root_dir:
@@ -208,6 +232,19 @@ def read_gt_endovis_masks(data_root_dir = "../data/endovis_2018",
             for mask_name in os.listdir(osp.join(gt_endovis_masks_path, f"seq{seq}")):
                 full_mask_name = f"seq{seq}/{mask_name}"
                 mask = torch.from_numpy(cv2.imread(osp.join(gt_endovis_masks_path, full_mask_name),cv2.IMREAD_GRAYSCALE))
+                
+                if convert2source:
+                    # Mapping MCS (EN17: class 6 → EN18: class 4)
+                    mapping = {
+                        6: 4,
+                        4: 6
+                    }
+                    # Create a new mask where each pixel is remapped
+                    mapped_mask = mask.clone()
+                    for src_class, tgt_class in mapping.items():
+                        mapped_mask[mask == src_class] = tgt_class
+                    mask = mapped_mask  # use the mapped version
+                
                 gt_endovis_masks[full_mask_name] = mask
             
             

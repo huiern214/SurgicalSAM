@@ -30,7 +30,8 @@ if "18" in dataset_name:
     dataset = Endovis18Dataset(data_root_dir = data_root_dir, 
                                 mode = "val",
                                 vit_mode = "h")
-    surgicalSAM_ckp = f"../ckp/surgical_sam/{dataset_name}/model_ckp.pth"
+    # surgicalSAM_ckp = f"../ckp/surgical_sam/{dataset_name}/model_ckp.pth"
+    surgicalSAM_ckp = f"./work_dirs/set2/endovis_2018/model_ckp.pth"
     
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir = data_root_dir,
                                             mode = "val")
@@ -42,7 +43,8 @@ elif "17" in dataset_name:
                                 fold = fold, 
                                 vit_mode = "h",
                                 version = 0)
-    surgicalSAM_ckp = f"../ckp/surgical_sam/{dataset_name}/fold{fold}/model_ckp.pth"
+    # surgicalSAM_ckp = f"../ckp/surgical_sam/{dataset_name}/fold{fold}/model_ckp.pth"
+    surgicalSAM_ckp = f"./work_dirs/set2/{dataset_name}/{fold}/model_ckp.pth"
     
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir = data_root_dir,
                                             mode = "val",

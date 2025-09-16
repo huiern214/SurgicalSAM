@@ -27,6 +27,8 @@ fold = args.fold
 thr = 0
 seed = 666  
 data_root_dir = f"../data/{dataset_name}"
+# data_root_dir = f"../data/set3/{dataset_name}"
+# data_root_dir = f"../data/en17to18_thres0.5/{dataset_name}/fold{fold}"
 batch_size = 32
 vit_mode = "h"
 
@@ -49,6 +51,8 @@ if "18" in dataset_name:
     num_epochs = 500
     lr = 0.001
     save_dir = "./work_dirs/endovis_2018/"
+    # save_dir = "./work_dirs/exp1/set3/endovis_2018/"
+    # save_dir = f"./work_dirs/exp4_finetune/thres0.5/endovis_2017_18/{fold}"
 
 elif "17" in dataset_name:
     num_tokens = 4
@@ -64,6 +68,7 @@ elif "17" in dataset_name:
     num_epochs = 2000
     lr = 0.0001
     save_dir = f"./work_dirs/endovis_2017/{fold}"
+    # save_dir = f"./work_dirs/exp1/set3/endovis_2017/{fold}"
     
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
@@ -81,6 +86,8 @@ for name, param in sam_decoder.named_parameters():
     param.requires_grad = True
 
 print("======> Load Prototypes and Prototype-based Prompt Encoder" )
+# if the model is trained for 4 classes only
+# learnable_prototypes_model = Learnable_Prototypes(num_classes = 4, feat_dim = 256).cuda()
 learnable_prototypes_model = Learnable_Prototypes(num_classes = 7, feat_dim = 256).cuda()
 protoype_prompt_encoder =  Prototype_Prompt_Encoder(feat_dim = 256, 
                                                     hidden_dim_dense = 128, 
@@ -126,11 +133,14 @@ best_challenge_iou_val = -100.0
 
 for epoch in range(num_epochs):   
     
-    # choose the augmentation version to use for the current epoch 
+    # no augmentation for training
+    # version = 0
+    
+    # choose the augmentation version to use for the current epoch *the odd epochs use augmented data, the even epochs use original data
     if epoch % 2 == 0 :
         version = 0 
     else:
-        version = int((epoch % 80 + 1)/2)
+        version = int((epoch % 80 + 1)/2) # means 1, 2, ..., 39, 40, 1, 2, ...
     
     if "18" in dataset_name:
         train_dataset = Endovis18Dataset(data_root_dir = data_root_dir,
