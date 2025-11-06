@@ -27,9 +27,9 @@ dataset_name = args.dataset
 fold = args.fold
 thr = 0
 seed = 666  
-data_root_dir = f"../data/{dataset_name}"
+# data_root_dir = f"../data/{dataset_name}"
 # data_root_dir = f"../data/set3/{dataset_name}"
-# data_root_dir = f"../data/en17to18_thres0.5/{dataset_name}/fold{fold}"
+data_root_dir = f"../data/en17to18_thres0.5/{dataset_name}/fold{fold}"
 batch_size = 32
 vit_mode = "h"
 
@@ -46,23 +46,24 @@ if "18" in dataset_name:
     # num_tokens = 2
     num_tokens = 4 # finetune en17 model
     val_dataset = Endovis18Dataset(data_root_dir = data_root_dir, 
-                                   map_to_en17 = True, # finetune en17 model using en18 dataset
+                                #    map_to_en17 = True, # finetune en17 model using en18 dataset
                                    mode="val",
                                    vit_mode = "h")
     
-    gt_endovis_masks = read_gt_endovis_masks(data_root_dir = data_root_dir, mode = "val",
-                                             convert2source=True) # finetune en17 model using en18 dataset *convert en18 label to en17
+    gt_endovis_masks = read_gt_endovis_masks(data_root_dir = data_root_dir, mode = "val")
+                                            #  convert2source=True) # finetune en17 model using en18 dataset *convert en18 label to en17
     num_epochs = 100 # finetune en17 model
     lr = 0.001
     if args.checkpoint_path:
         surgicalSAM_ckp = args.checkpoint_path
     else:
         # surgicalSAM_ckp = f"../ckp/surgical_sam/{dataset_name}/model_ckp.pth"
-        surgicalSAM_ckp = f"./work_dirs/exp1/set2/endovis_2017/{fold}/model_ckp.pth"
+        # surgicalSAM_ckp = f"./work_dirs/exp1/set2/endovis_2017/{fold}/model_ckp.pth"
+        surgicalSAM_ckp = f"./work_dirs/set2_en17_ckp/{fold}/model_ckp.pth"
     
-    save_dir = "./work_dirs/endovis_2018/"
-    # save_dir = "./work_dirs/set3/endovis_2018/"
-    # save_dir = f"./work_dirs/exp4_finetune/thres0.5/endovis_2017_18/{fold}"
+    # save_dir = f"./work_dirs/exp9/v2_no_aug_pseudolabel_train_finetune_endovis_2018/{fold}"
+    # save_dir = f"./work_dirs/set3/endovis_2018/{fold}"
+    save_dir = f"./work_dirs/exp4_finetune/thres0.5/endovis_2017_18/{fold}"
 
 elif "17" in dataset_name:
     # num_tokens = 4
@@ -70,13 +71,13 @@ elif "17" in dataset_name:
     val_dataset = Endovis17Dataset(data_root_dir = data_root_dir,
                                    mode = "val",
                                    fold = fold, 
-                                   map_to_en18 = True, # finetune en18 model using en17 dataset
+                                #    map_to_en18 = True, # finetune en18 model using en17 dataset
                                    vit_mode = "h",
                                    version = 0)
     
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir = data_root_dir, 
-                                             mode = "val", fold = fold,
-                                             convert2source=True) # finetune en18 model using en17 dataset *convert en17 label to en18
+                                             mode = "val", fold = fold)
+                                            #  convert2source=True) # finetune en18 model using en17 dataset *convert en17 label to en18
     num_epochs = 100 # finetune en18 model
     lr = 0.0001
     if args.checkpoint_path:
@@ -171,14 +172,14 @@ for epoch in range(num_epochs):
         train_dataset = Endovis18Dataset(data_root_dir = data_root_dir,
                                          mode="train",
                                          vit_mode = vit_mode,
-                                         map_to_en17= True, # finetune en17 model using en18 dataset
+                                        #  map_to_en17= True, # finetune en17 model using en18 dataset
                                          version = version)
         
     elif "17" in dataset_name:
         train_dataset = Endovis17Dataset(data_root_dir = data_root_dir,
                                          mode="train",
                                          fold = fold,
-                                         map_to_en18 = True, # finetune en18 model using en17 dataset
+                                        #  map_to_en18 = True, # finetune en18 model using en17 dataset
                                          vit_mode = vit_mode,
                                          version = version)
         

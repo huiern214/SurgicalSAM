@@ -45,7 +45,8 @@ def main():
     print(f"======> Cross-Dataset Evaluation: {train_dataset} -> {test_dataset}")
     
     # Set data paths
-    data_root_dir = f"../data/{dataset_version}/{test_dataset}"
+    # data_root_dir = f"../data/{dataset_version}/{test_dataset}"
+    data_root_dir = f"../data/{test_dataset}"
     
     # Load dataset-specific parameters
     if test_dataset == "endovis_2018":
@@ -103,7 +104,11 @@ def main():
             surgicalSAM_ckp = args.checkpoint_path
         else:
             # surgicalSAM_ckp = f"./work_dirs/exp1/{dataset_version}/{train_dataset}/{fold}/model_ckp.pth"
-            surgicalSAM_ckp = f"./work_dirs/exp4_finetune/thres0.5_aug/endovis_2017_18/{fold}/model_ckp.pth"
+            # surgicalSAM_ckp = f"/home/users/astar/i2r/stuhuiern/scratch/SurgicalSAM/surgicalSAM/work_dirs/exp7/aug_gpu8_001_DiceFG_05allKL/{fold}/model_ckp.pth"
+            # surgicalSAM_ckp = f"./work_dirs/set2_en17_ckp/{fold}/model_ckp.pth"
+            # surgicalSAM_ckp = f"/home/users/astar/i2r/stuhuiern/scratch/SurgicalSAM/ckp/surgical_sam/endovis_2017/fold{fold}/model_ckp.pth"
+            surgicalSAM_ckp = f"/home/users/astar/i2r/stuhuiern/scratch/SurgicalSAM/surgicalSAM/work_dirs/exp10/endovis_2018/Dice_noKLwithAugUnion/{fold}/model_ckp.pth"
+            # surgicalSAM_ckp = f"/home/users/astar/i2r/stuhuiern/scratch/SurgicalSAM/surgicalSAM/work_dirs/exp1/endovis_2018/dice_000001_no_consistency_loss/{fold}/model_ckp.pth"
 
     # Define the models
     learnable_prototypes_model = Learnable_Prototypes(num_classes=num_classes, feat_dim=256).cuda()
@@ -194,7 +199,10 @@ def main():
     print(f"\nMean IoU (BF, PF, LND, MCS): {mean_iou:.3f}")
     
     # if True:
-    #     output_mask_dir = f"output_masks_endovis17_to_endovis18_set2/thres0.5/fold" + str(fold) + "/" + test_dataset_type
+    #     if test_dataset_type == "train":
+    #         output_mask_dir = f"../data/en17to18_thres0.5/fold" + str(fold) + "/" + test_dataset_type + "/0/annotations"
+    #     else:
+    #         output_mask_dir = f"../data/en17to18_thres0.5/fold" + str(fold) + "/" + test_dataset_type + "/annotations"
     #     # output_mask_dir = f"output_masks_endovis17_to_endovis18_set2/percentile90/fold" + str(fold) + "/" + test_dataset_type
     #     os.makedirs(output_mask_dir, exist_ok=True)
 

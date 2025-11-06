@@ -192,3 +192,105 @@ class DiceLoss(nn.Module):
       
         return loss
 
+
+def kl_bernoulli(p, q, eps=1e-6):
+    """
+    Compute Bernoulli KL divergence: KL(p || q)
+    Using PyTorch's F.kl_div for numerical stability.
+    
+    Args:
+        p: [B, H, W] - target distribution (teacher predictions)
+        q: [B, H, W] - input distribution (student predictions)
+        eps: small constant for numerical stability
+    
+    Returns:
+        [B, H, W] - per-pixel KL divergence
+    """
+    p = p.clamp(eps, 1 - eps)
+    q = q.clamp(eps, 1 - eps)
+    
+    # Stack into 2-class distributions [B, 2, H, W]
+    p2 = torch.stack([p, 1 - p], dim=1) # target (teacher)
+    q2 = torch.stack([q, 1 - q], dim=1) # input (student)
+    
+    # F.kl_div(input_log_probs, target_probs) computes KL(target || input)
+    # So F.kl_div(q2.log(), p2) computes KL(p || q)
+    kl = F.kl_div(q2.log(), p2, reduction="none").sum(dim=1)  # [B, H, W]
+    
+    return kl
+
+# def bce_loss(
+#     probs,        # after sigmoid: [B,1,H,W] or [B,H,W]
+#     target,         # same shape, values 0 or 1
+#     per_pixel = False,      # True → return per-pixel loss map; False → return mean scalar
+#     weight = None,
+#     eps = 1e-7
+# ):
+#     """
+#     BCE loss for sigmoid outputs in segmentation (no ignore_index).
+    
+#     Args:
+#         probs: model output after sigmoid.
+#         target: binary ground truth (0/1).
+#         per_pixel: if True, returns per-pixel loss map.
+#         weight: optional weighting tensor, same shape as probs or broadcastable.
+#         eps: small constant for numerical stability.
+#     """
+#     # clamp to avoid log(0)
+#     probs = probs.clamp(eps, 1 - eps)
+#     target = target.to(probs.dtype)
+
+#     # element-wise BCE (no reduction)
+#     loss = F.binary_cross_entropy(probs, target, reduction="none")
+
+#     if weight is not None:
+#         loss = loss * weight
+
+#     # pixel map or scalar
+#     if per_pixel:
+#         return loss
+#     else:
+#         return loss.mean()
+
+# def dice_loss_with_consistency(p_student, p_teacher_aug, offline_pseudolabel_mask):
+#     """
+#     Compute consistency loss with offline pseudo label as mask.
+    
+#     Formula:
+#         loss = [offline_pseudolabel_mask * Dice_offline + (1-offline_pseudolabel_mask) * KL_online].mean()
+    
+#     Interpretation:
+#         - Where offline_pseudolabel_mask > 0.5 (foreground): use offline pseudo label
+#         - Where offline_pseudolabel_mask < 0.5 (background): use online teacher label
+    
+#     Args:
+#         p_student: [B, H, W] - student predictions (probabilities)
+#         p_teacher_aug: [B, H, W] - teacher predictions on augmented image (online label)
+#         offline_pseudolabel_mask: [B, H, W] - offline pseudo labels after augmentation (0-1)
+#                                This also serves as the mask
+    
+#     Returns:
+#         scalar loss
+#     """
+#     # print(f"p_student {p_student.shape}, p_teacher_aug {p_teacher_aug.shape}, offline pseudolabel {offline_pseudolabel_mask.shape}")
+#     # Compute both KL divergences per-pixel
+#     # bce_offline = bce_loss(p_student, offline_pseudolabel_mask, per_pixel=True)  # [B, H, W]
+#     kl_online = kl_bernoulli(p_teacher_aug, p_student)   # [B, H, W]
+    
+#     # Weighted combination: y_hat acts as mask
+#     # Foreground (offline_pseudolabel_mask≈1): use offline, Background (offline_pseudolabel_mask≈0): use online
+#     # loss_combined = offline_pseudolabel_mask * bce_offline + (1 - offline_pseudolabel_mask) * kl_online
+#     # print(f"offline bce {bce_offline.shape} and online kl {kl_online.shape} and fg pixel {offline_pseudolabel_mask.numel()} and bg pixel {(1-offline_pseudolabel_mask).numel()}")
+#     # loss_combined = kl_online
+# kl_bg = (1 - offline_pseudolabel_mask) *  kl_bernoulli(p_teacher_aug, p_student)
+# kl_bg = kl_bg.mean()
+#     # Sum and divide by total number of pixels
+#     # total_pixels = loss_combined.numel()
+#     # total_pixels = kl_combined.numel()
+#     # loss = kl_combined.sum() / total_pixels
+    
+#     # loss = loss_combined.mean()
+
+#     # print(f"here {loss_combined.sum() / total_pixels} same as mean {loss}")
+    
+#     return loss

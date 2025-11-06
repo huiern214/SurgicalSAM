@@ -125,48 +125,48 @@ def generate_class_embeddings_from_existing_features(
             
 
 generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold0/train/0/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold0/train/0/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold0/train/0/class_embeddings_h"
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold0/train/0/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold0/train/0/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold0/train/0/class_embeddings_h"
 )
 generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold0/val/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold0/val/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold0/val/class_embeddings_h"
-)
-
-
-generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold1/train/0/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold1/train/0/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold1/train/0/class_embeddings_h"
-)
-generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold1/val/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold1/val/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold1/val/class_embeddings_h"
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold0/val/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold0/val/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold0/val/class_embeddings_h"
 )
 
 
 generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold2/train/0/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold2/train/0/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold2/train/0/class_embeddings_h"
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold1/train/0/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold1/train/0/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold1/train/0/class_embeddings_h"
 )
 generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold2/val/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold2/val/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold2/val/class_embeddings_h"
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold1/val/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold1/val/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold1/val/class_embeddings_h"
 )
 
 
 generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold3/train/0/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold3/train/0/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold3/train/0/class_embeddings_h"
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold2/train/0/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold2/train/0/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold2/train/0/class_embeddings_h"
 )
 generate_class_embeddings_from_existing_features(
-    mask_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold3/val/binary_annotations",
-    feat_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold3/val/sam_features_h",
-    class_embedding_save_dir="/scr/user/huiern214/SurgicalSAM/data/en17to18_thres0.5/endovis_2018/fold3/val/class_embeddings_h"
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold2/val/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold2/val/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold2/val/class_embeddings_h"
+)
+
+
+generate_class_embeddings_from_existing_features(
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold3/train/0/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold3/train/0/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold3/train/0/class_embeddings_h"
+)
+generate_class_embeddings_from_existing_features(
+    mask_dir="../../data/en17to18_thres0.5/endovis_2018/fold3/val/binary_annotations",
+    feat_dir="../../data/en17to18_thres0.5/endovis_2018/fold3/val/sam_features_h",
+    class_embedding_save_dir="../../data/en17to18_thres0.5/endovis_2018/fold3/val/class_embeddings_h"
 )

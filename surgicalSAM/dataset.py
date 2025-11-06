@@ -5,11 +5,18 @@ import re
 import numpy as np 
 import cv2 
 
+# en17 class: 1234 
+# en18 class: 1236 
+# finetune en17 1234 model using en18 pseudolabel 1234
+# inference en17 1234 model on en18 true label 1236 (map 6 to 4)
+# train en17 1234 model from scratch using val set en18 true label 1236 (map 6 to 4)
+
 class Endovis18Dataset(Dataset):
     def __init__(self, data_root_dir = "../data/endovis_2018", 
                  mode = "val", 
                  vit_mode = "h",
                  map_to_en17 = False,
+                 with_img = False,
                  version = 0):
         
         """Define the Endovis18 dataset
@@ -23,7 +30,8 @@ class Endovis18Dataset(Dataset):
         
         self.vit_mode = vit_mode
         self.map_to_en17 = map_to_en17
-        
+        self.with_img = with_img
+
         # Mapping from Endovis2018 to Endovis2017 if needed
         self.mapping = {
             1: 1,  # BF
@@ -48,8 +56,11 @@ class Endovis18Dataset(Dataset):
                 continue 
             
             if map_to_en17:
-                # only class id 1, 2, 3, 6 (en17 model train/predict on en18 dataset)
-                self.mask_list += [osp.join(osp.basename(subdir), i) for i in files if re.search(r"class[1236]", i)]
+                # only class id 1, 2, 3, 6 (en17 model train/predict on en18 dataset pseudolabel)
+                # self.mask_list += [osp.join(osp.basename(subdir), i) for i in files if re.search(r"class[1236]", i)]
+                # only class id 1, 2, 3, 4 (en17 model train/predict on en18 dataset)
+                self.mask_list += [osp.join(osp.basename(subdir), i) for i in files if re.search(r"class[1234]", i)]
+                # self.mask_list += [osp.join(osp.basename(subdir),i) for i in files]
             else:
                 # all classes
                 self.mask_list += [osp.join(osp.basename(subdir),i) for i in files]
@@ -69,6 +80,11 @@ class Endovis18Dataset(Dataset):
         feat_dir = osp.join(self.mask_dir.replace("binary_annotations", f"sam_features_{self.vit_mode}"), mask_name.split("_")[0] + ".npy")
         sam_feat = np.load(feat_dir)
         
+        # get image
+        if self.with_img:
+            img_dir = osp.join(self.mask_dir.replace("binary_annotations", f"images"), mask_name.split("_")[0] + ".png")
+            img = cv2.imread(img_dir)
+        
         # get ground-truth mask
         mask_path = osp.join(self.mask_dir, mask_name)
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
@@ -78,13 +94,15 @@ class Endovis18Dataset(Dataset):
         class_embedding = np.load(class_embedding_path)
 
         # Map class id if requested
-        if self.map_to_en17:
+        if self.map_to_en17: # change class id 4 to 6
             cls_id = self.mapping.get(cls_id, -1)  # default to -1 if not found
             # update the class ID in the mask name string too
             mask_name = re.sub(r"class\d+", f"class{cls_id}", mask_name)
             
-        return sam_feat, mask_name, cls_id, mask, class_embedding
- 
+        if self.with_img:
+            return sam_feat, mask_name, cls_id, mask, class_embedding, img
+        else:
+            return sam_feat, mask_name, cls_id, mask, class_embedding
 
 class Endovis17Dataset(Dataset):
     def __init__(self, data_root_dir = "../data/endovis_2017", 
@@ -92,11 +110,13 @@ class Endovis17Dataset(Dataset):
                  fold = 0,  
                  vit_mode = "h",
                  map_to_en18 = False,
+                 with_img = False,
                  version = 0):
                         
         self.vit_mode = vit_mode
         self.map_to_en18 = map_to_en18
-        
+        self.with_img = with_img
+
         # Mapping from Endovis2017 to Endovis2018 if needed
         self.mapping = {
             1: 1,  # BF
@@ -125,8 +145,10 @@ class Endovis17Dataset(Dataset):
         for seq in seqs:
             seq_path = osp.join(self.mask_dir, f"seq{seq}")
             if self.map_to_en18:
-                # only class id 1, 2, 3, 4 (en18 model train/predict on en17 dataset)
+                # only class id 1, 2, 3, 4 (en18 model train/predict on en17 dataset pseudolabel)
                 self.mask_list += [f"seq{seq}/{mask}" for mask in os.listdir(seq_path) if re.search(r"class[1234]", mask)]
+                # # only class id 1, 2, 3, 6 (en17 model train/predict on en18 dataset)
+                # self.mask_list += [f"seq{seq}/{mask}" for mask in os.listdir(seq_path) if re.search(r"class[1236]", mask)]
             else:
                 # all classes
                 self.mask_list += [f"seq{seq}/{mask}" for mask in os.listdir(seq_path)]
@@ -146,6 +168,11 @@ class Endovis17Dataset(Dataset):
         feat_dir = osp.join(self.mask_dir.replace("binary_annotations", f"sam_features_{self.vit_mode}"), mask_name.split("_")[0] + ".npy")
         sam_feat = np.load(feat_dir)
         
+        # get image
+        if self.with_img:
+            img_dir = osp.join(self.mask_dir.replace("binary_annotations", f"images"), mask_name.split("_")[0] + ".jpg")
+            img = cv2.imread(img_dir)
+        
         # get ground-truth mask
         mask_path = osp.join(self.mask_dir, mask_name)
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
@@ -160,5 +187,7 @@ class Endovis17Dataset(Dataset):
             # update the class ID in the mask name string too
             mask_name = re.sub(r"class\d+", f"class{cls_id}", mask_name)
         
-        return sam_feat, mask_name, cls_id, mask, class_embedding
-    
+        if self.with_img:
+            return sam_feat, mask_name, cls_id, mask, class_embedding, img
+        else:
+            return sam_feat, mask_name, cls_id, mask, class_embedding

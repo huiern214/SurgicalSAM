@@ -101,12 +101,12 @@ def eval_endovis(endovis_masks, gt_endovis_masks, num_classes=7):
     for file_name, prediction in endovis_masks.items():
        
         full_mask = gt_endovis_masks[file_name]
-        if num_classes == 4:
-            # en17 model
-            allowed_classes = [1,2,3,6]
-            full_mask[~torch.isin(full_mask, torch.tensor(allowed_classes))] = 0
-            # en18 model
-            # full_mask[full_mask > num_classes] = 0  # Ensure no class id exceeds num_classes (1,2,3,4)
+    
+        # en17 model
+        # allowed_classes = [1,2,3,6]
+        # full_mask[~torch.isin(full_mask, torch.tensor(allowed_classes))] = 0
+        # en18 model
+        # full_mask[full_mask > num_classes] = 0  # Ensure no class id exceeds num_classes (1,2,3,4)
 
         im_iou = []
         im_iou_challenge = []
@@ -129,7 +129,8 @@ def eval_endovis(endovis_masks, gt_endovis_masks, num_classes=7):
             current_pred = (prediction == class_id).astype(np.float64)
             current_target = (full_mask.numpy() == class_id).astype(np.float64)
 
-            if current_pred.astype(np.float64).sum() != 0 or current_target.astype(np.float64).sum() != 0:
+            # if current_pred.astype(np.float64).sum() != 0 or current_target.astype(np.float64).sum() != 0:
+            if current_pred.astype(np.float64).sum() != 0:
                 i, u = compute_mask_IU_endovis(current_pred, current_target)     
                 im_iou.append(i/u)
                 cum_I += i
